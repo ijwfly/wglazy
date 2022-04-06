@@ -1,5 +1,5 @@
 # install dependencies
-apt update && apt install wireguard wireguard-tools qrencode -y
+apt update && apt install python3-venv wireguard wireguard-tools qrencode -y
 
 # init python3
 python3 -m venv venv
