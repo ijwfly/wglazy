@@ -10,7 +10,7 @@ from wg.wireguard import WireGuardController
 DEFAULT_NETWORK = "10.8.0.0/24"
 DEFAULT_DNS = "1.1.1.1"
 DEFAULT_CONFIG_PATH = "config.json"
-DEFAULT_WG_CONFIG_PATH = "/etc/wireguard/configs/wg0.conf"
+DEFAULT_WG_CONFIG_PATH = "/etc/wireguard/wg0.conf"
 DEFAULT_WG_CLIENTS_PATH = "configs/"
 
 
