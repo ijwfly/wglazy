@@ -40,7 +40,7 @@ class WgServerConfig(BaseModel):
             IPv4Network: lambda v: IPv4Network(v),
         }
 
-    def create_new_client(self, name: str, allowed_ips: str = None,
+    def create_new_client(self, name: str, allowed_ips: str = "0.0.0.0/0",
                           persistent_keepalive: int = 20) -> WgClientConfig:
         client_private_key, client_public_key = WireGuardController.generate_keys()
 
@@ -50,9 +50,6 @@ class WgServerConfig(BaseModel):
             client_address = str(next(h for h in self.local_network.hosts() if str(h) not in used_addresses))
         except StopIteration:
             raise RuntimeError("No free address in network")
-
-        if allowed_ips is None:
-            allowed_ips = self.local_address
 
         client = WgClientConfig(
             name=name,
