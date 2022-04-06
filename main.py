@@ -2,7 +2,6 @@ from wg.config import load_config, save_config, save_server_config, save_clients
 
 if __name__ == "__main__":
     server_config_obj = load_config()
-    print(server_config_obj)
     client_name = input("Enter client name: ")
     server_config_obj.create_new_client(client_name)
     print(server_config_obj.generate_config())

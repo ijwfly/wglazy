@@ -79,15 +79,14 @@ AllowedIPs = {client.local_address}/{self.local_network.prefixlen}""" for client
     def generate_client_configs(self) -> Dict[str, str]:
         result = {}
         for client in self.clients:
-            result[client.name] = f"""
-[Interface]
-Address = {client.local_address}/{self.local_network.prefixlen}
+            result[client.name] = f"""[Interface]
 PrivateKey = {client.private_key}
+Address = {client.local_address}/{self.local_network.prefixlen}
 DNS = {DEFAULT_DNS}
 
 [Peer]
 PublicKey = {self.public_key}
-AllowedsIPs = {client.allowed_ips}
+AllowedIPs = {client.allowed_ips}
 Endpoint = {self.real_ip}:{self.listen_port}
 PersistentKeepalive = {client.persistent_keepalive}"""
 
