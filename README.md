@@ -1,0 +1,2 @@
+# wglazy
+Wireguard lazy automation
