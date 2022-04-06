@@ -1,2 +1,2 @@
 # wglazy
-Wireguard lazy automation
+Wireguard lazy automation project developed to test github copilot
