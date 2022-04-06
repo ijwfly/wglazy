@@ -71,7 +71,7 @@ ListenPort = {self.listen_port}"""
         peer_config = "\n\n".join([
             f"""[Peer]
 PublicKey = {client.public_key}
-AllowedIPs = {client.local_address}/{self.local_network.prefixlen}""" for client in self.clients
+AllowedIPs = {client.local_address}/32""" for client in self.clients
         ])
 
         return "\n\n".join([interface_config, peer_config])
