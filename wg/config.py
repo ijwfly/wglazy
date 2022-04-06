@@ -1,5 +1,6 @@
+import json
 import urllib.request
-from typing import List
+from typing import List, Dict
 
 from ipaddress import IPv4Network
 from pydantic import BaseModel
@@ -8,6 +9,9 @@ from wg.wireguard import WireGuardController
 
 DEFAULT_NETWORK = "10.8.0.0/24"
 DEFAULT_DNS = "1.1.1.1"
+DEFAULT_CONFIG_PATH = "config.json"
+DEFAULT_WG_CONFIG_PATH = "configs/wg0.conf"
+DEFAULT_WG_CLIENTS_PATH = "configs/"
 
 
 class WgClientConfig(BaseModel):
@@ -72,10 +76,10 @@ AllowedIPs = {client.local_address}/{self.local_network.prefixlen}""" for client
 
         return "\n\n".join([interface_config, peer_config])
 
-    def generate_client_configs(self) -> List[str]:
-        result = []
+    def generate_client_configs(self) -> Dict[str, str]:
+        result = {}
         for client in self.clients:
-            result.append(f"""
+            result[client.name] = f"""
 [Interface]
 Address = {client.local_address}/{self.local_network.prefixlen}
 PrivateKey = {client.private_key}
@@ -85,7 +89,8 @@ DNS = {DEFAULT_DNS}
 PublicKey = {self.public_key}
 AllowedsIPs = {client.allowed_ips}
 Endpoint = {self.real_ip}:{self.listen_port}
-PersistentKeepalive = {client.persistent_keepalive}""")
+PersistentKeepalive = {client.persistent_keepalive}"""
+
         return result
 
 
@@ -102,3 +107,34 @@ def new_server_config() -> WgServerConfig:
         public_key=server_public_key,
         clients=[],
     )
+
+
+def load_config(path=DEFAULT_CONFIG_PATH, or_create=True):
+    try:
+        with open(path) as f:
+            json_config = json.load(f)
+            server_config = WgServerConfig(**json_config)
+    except FileNotFoundError:
+        if not or_create:
+            raise
+        server_config = new_server_config()
+        with open(path, "w") as f:
+            f.write(server_config.json())
+    return server_config
+
+
+def save_config(server_config, path=DEFAULT_CONFIG_PATH):
+    with open(path, "w") as f:
+        f.write(server_config.json())
+
+
+def save_server_config(server_config: WgServerConfig, path=DEFAULT_WG_CONFIG_PATH):
+    with open(path, "w") as f:
+        f.write(server_config.generate_config())
+
+
+def save_clients_config(server_config: WgServerConfig, path=DEFAULT_WG_CLIENTS_PATH):
+    client_configs = server_config.generate_client_configs()
+    for client_name, client_config in client_configs.items():
+        with open(f"{path}/{client_name}.conf", "w") as f:
+            f.write(client_config)

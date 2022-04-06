@@ -1,27 +1,18 @@
-import json
-
-from wg.config import WgServerConfig, new_server_config
-
-DEFAULT_CONFIG_PATH = "config.json"
-
-
-def load_config(path=DEFAULT_CONFIG_PATH):
-    try:
-        with open(path) as f:
-            json_config = json.load(f)
-            server_config = WgServerConfig(**json_config)
-    except FileNotFoundError:
-        server_config = new_server_config()
-        with open(path, "w") as f:
-            f.write(server_config.json())
-    return server_config
-
+from wg.config import load_config, save_config, save_server_config, save_clients_config
 
 if __name__ == "__main__":
-    config = load_config()
-    print(config)
-    config.create_new_client("maxim_iphone")
-    print(config.generate_config())
-    print("\n\n\n")
-    for config in config.generate_client_configs():
-        print(config)
+    server_config_obj = load_config()
+    print(server_config_obj)
+    client_name = input("Enter client name: ")
+    server_config_obj.create_new_client(client_name)
+    print(server_config_obj.generate_config())
+    print("\n\n")
+    for client_name, client_config in server_config_obj.generate_client_configs().items():
+        print('-------------')
+        print(client_name)
+        print(client_config)
+
+    save_config(server_config_obj)
+
+    save_server_config(server_config_obj)
+    save_clients_config(server_config_obj)
